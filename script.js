@@ -74,3 +74,47 @@ function highlightLine(index) {
     currentLineIndex = index;
   }
 }
+
+// =========================
+// VOICE RECORDING LOGIC
+// =========================
+
+let mediaRecorder;
+let recordedChunks = [];
+
+const recordBtn = document.getElementById("recordBtn");
+const stopBtn = document.getElementById("stopBtn");
+const recordedAudio = document.getElementById("recordedAudio");
+
+recordBtn.addEventListener("click", async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+    recordedChunks = [];
+
+    mediaRecorder.ondataavailable = event => {
+      if (event.data.size > 0) {
+        recordedChunks.push(event.data);
+      }
+    };
+
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(recordedChunks, { type: "audio/webm" });
+      recordedAudio.src = URL.createObjectURL(blob);
+    };
+
+    mediaRecorder.start();
+    recordBtn.disabled = true;
+    stopBtn.disabled = false;
+  } catch (err) {
+    alert("Microphone access denied or not available");
+  }
+});
+
+stopBtn.addEventListener("click", () => {
+  if (mediaRecorder && mediaRecorder.state !== "inactive") {
+    mediaRecorder.stop();
+    recordBtn.disabled = false;
+    stopBtn.disabled = true;
+  }
+});
