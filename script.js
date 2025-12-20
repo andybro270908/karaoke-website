@@ -1,9 +1,10 @@
-stopBtn.disabled = true;
 const audioFileInput = document.getElementById("audioFile");
 const lyricsFileInput = document.getElementById("lyricsFile");
 const startBtn = document.getElementById("startKaraoke");
 const audioPlayer = document.getElementById("audioPlayer");
 const lyricsList = document.getElementById("lyricsList");
+
+stopBtn.disabled = true;
 
 let lyricsLines = [];
 let currentLineIndex = 0;
