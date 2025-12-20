@@ -1,5 +1,3 @@
-alert("script.js loaded");
-
 const audioFileInput = document.getElementById("audioFile");
 const lyricsFileInput = document.getElementById("lyricsFile");
 const startBtn = document.getElementById("startKaraoke");
