@@ -1,36 +1,31 @@
-console.log("script.js running");
-
+// ELEMENTS
 const audioFileInput = document.getElementById("audioFile");
 const lyricsFileInput = document.getElementById("lyricsFile");
 const startBtn = document.getElementById("startKaraoke");
 const audioPlayer = document.getElementById("audioPlayer");
 const lyricsList = document.getElementById("lyricsList");
+const recordBtn = document.getElementById("recordBtn");
+const stopBtn = document.getElementById("stopBtn");
+const recordedAudio = document.getElementById("recordedAudio");
 
 stopBtn.disabled = true;
 
 let lyricsLines = [];
-let currentLineIndex = 0;
-let lineDuration = 0;
+let currentLine = 0;
 
-// Load audio
+// LOAD AUDIO
 audioFileInput.addEventListener("change", () => {
-  const file = audioFileInput.files[0];
-  if (file) {
-    audioPlayer.src = URL.createObjectURL(file);
-  }
+  audioPlayer.src = URL.createObjectURL(audioFileInput.files[0]);
 });
 
-// Load lyrics
+// LOAD LYRICS
 lyricsFileInput.addEventListener("change", () => {
-  const file = lyricsFileInput.files[0];
-  if (!file) return;
-
   const reader = new FileReader();
   reader.onload = () => {
     lyricsLines = reader.result
       .split("\n")
-      .map(line => line.trim())
-      .filter(line => line !== "");
+      .map(l => l.trim())
+      .filter(Boolean);
 
     lyricsList.innerHTML = "";
     lyricsLines.forEach(line => {
@@ -39,88 +34,51 @@ lyricsFileInput.addEventListener("change", () => {
       lyricsList.appendChild(li);
     });
   };
-  reader.readAsText(file);
+  reader.readAsText(lyricsFileInput.files[0]);
 });
 
-// Start karaoke
+// START KARAOKE
 startBtn.addEventListener("click", () => {
-  console.log("Start Karaoke clicked");
-  
   if (!audioPlayer.src || lyricsLines.length === 0) {
     alert("Please upload audio and lyrics first");
     return;
   }
 
   audioPlayer.play();
-  currentLineIndex = 0;
-
-  const totalDuration = audioPlayer.duration;
-  lineDuration = totalDuration / lyricsLines.length;
-
-  highlightLine(0);
+  const duration = audioPlayer.duration / lyricsLines.length;
 
   setInterval(() => {
-    const currentTime = audioPlayer.currentTime;
-    const newIndex = Math.floor(currentTime / lineDuration);
-
-    if (newIndex !== currentLineIndex && newIndex < lyricsLines.length) {
-      highlightLine(newIndex);
-    }
+    const index = Math.floor(audioPlayer.currentTime / duration);
+    highlight(index);
   }, 300);
 });
 
-function highlightLine(index) {
-  const allLines = lyricsList.querySelectorAll("li");
-
-  allLines.forEach(li => li.classList.remove("active"));
-
-  if (allLines[index]) {
-    allLines[index].classList.add("active");
-    allLines[index].scrollIntoView({ behavior: "smooth", block: "center" });
-    currentLineIndex = index;
-  }
+function highlight(index) {
+  const items = lyricsList.querySelectorAll("li");
+  items.forEach(li => li.classList.remove("active"));
+  if (items[index]) items[index].classList.add("active");
 }
 
-// =========================
-// VOICE RECORDING LOGIC
-// =========================
-
-let mediaRecorder;
-let recordedChunks = [];
-
-const recordBtn = document.getElementById("recordBtn");
-const stopBtn = document.getElementById("stopBtn");
-const recordedAudio = document.getElementById("recordedAudio");
+// RECORDING
+let recorder, chunks = [];
 
 recordBtn.addEventListener("click", async () => {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaRecorder = new MediaRecorder(stream);
-    recordedChunks = [];
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  recorder = new MediaRecorder(stream);
+  chunks = [];
 
-    mediaRecorder.ondataavailable = event => {
-      if (event.data.size > 0) {
-        recordedChunks.push(event.data);
-      }
-    };
+  recorder.ondataavailable = e => chunks.push(e.data);
+  recorder.onstop = () => {
+    recordedAudio.src = URL.createObjectURL(new Blob(chunks));
+  };
 
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(recordedChunks, { type: "audio/webm" });
-      recordedAudio.src = URL.createObjectURL(blob);
-    };
-
-    mediaRecorder.start();
-    recordBtn.disabled = true;
-    stopBtn.disabled = false;
-  } catch (err) {
-    alert("Microphone access denied or not available");
-  }
+  recorder.start();
+  recordBtn.disabled = true;
+  stopBtn.disabled = false;
 });
 
 stopBtn.addEventListener("click", () => {
-  if (mediaRecorder && mediaRecorder.state !== "inactive") {
-    mediaRecorder.stop();
-    recordBtn.disabled = false;
-    stopBtn.disabled = true;
-  }
+  recorder.stop();
+  recordBtn.disabled = false;
+  stopBtn.disabled = true;
 });
