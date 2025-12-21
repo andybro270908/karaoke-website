@@ -1,84 +1,49 @@
-// ELEMENTS
-const audioFileInput = document.getElementById("audioFile");
-const lyricsFileInput = document.getElementById("lyricsFile");
-const startBtn = document.getElementById("startKaraoke");
-const audioPlayer = document.getElementById("audioPlayer");
-const lyricsList = document.getElementById("lyricsList");
-const recordBtn = document.getElementById("recordBtn");
-const stopBtn = document.getElementById("stopBtn");
-const recordedAudio = document.getElementById("recordedAudio");
-
-stopBtn.disabled = true;
-
-let lyricsLines = [];
-let currentLine = 0;
-
-// LOAD AUDIO
-audioFileInput.addEventListener("change", () => {
-  audioPlayer.src = URL.createObjectURL(audioFileInput.files[0]);
-});
-
-// LOAD LYRICS
-lyricsFileInput.addEventListener("change", () => {
-  const reader = new FileReader();
-  reader.onload = () => {
-    lyricsLines = reader.result
-      .split("\n")
-      .map(l => l.trim())
-      .filter(Boolean);
-
-    lyricsList.innerHTML = "";
-    lyricsLines.forEach(line => {
-      const li = document.createElement("li");
-      li.textContent = line;
-      lyricsList.appendChild(li);
-    });
-  };
-  reader.readAsText(lyricsFileInput.files[0]);
-});
-
-// START KARAOKE
-startBtn.addEventListener("click", () => {
-  if (!audioPlayer.src || lyricsLines.length === 0) {
-    alert("Please upload audio and lyrics first");
-    return;
-  }
-
-  audioPlayer.play();
-  const duration = audioPlayer.duration / lyricsLines.length;
-
-  setInterval(() => {
-    const index = Math.floor(audioPlayer.currentTime / duration);
-    highlight(index);
-  }, 300);
-});
-
-function highlight(index) {
-  const items = lyricsList.querySelectorAll("li");
-  items.forEach(li => li.classList.remove("active"));
-  if (items[index]) items[index].classList.add("active");
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: #0b0b12;
+  color: white;
+  text-align: center;
 }
 
-// RECORDING
-let recorder, chunks = [];
+header {
+  padding: 16px;
+  font-size: 20px;
+  font-weight: bold;
+  background: #111;
+}
 
-recordBtn.addEventListener("click", async () => {
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  recorder = new MediaRecorder(stream);
-  chunks = [];
+section {
+  padding: 25px 20px;
+}
 
-  recorder.ondataavailable = e => chunks.push(e.data);
-  recorder.onstop = () => {
-    recordedAudio.src = URL.createObjectURL(new Blob(chunks));
-  };
+audio {
+  width: 90%;
+  margin-top: 10px;
+}
 
-  recorder.start();
-  recordBtn.disabled = true;
-  stopBtn.disabled = false;
-});
+button {
+  padding: 12px 20px;
+  border-radius: 999px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  background: linear-gradient(135deg, #d946ef, #6366f1);
+  color: white;
+}
 
-stopBtn.addEventListener("click", () => {
-  recorder.stop();
-  recordBtn.disabled = false;
-  stopBtn.disabled = true;
-});
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#currentLine {
+  font-size: 20px;
+  margin: 20px 0;
+  min-height: 40px;
+}
+
+footer {
+  padding: 20px;
+  opacity: 0.6;
+}
