@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Karaoke Website</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -15,46 +13,43 @@
   <header id="app-header">
     <div class="logo">🎤 Karaoke</div>
     <nav>
-      <button id="themeToggle">🌙</button>
       <a href="#about">About</a>
     </nav>
   </header>
 
-  <!-- HERO SECTION -->
+  <!-- HERO -->
   <section id="hero">
     <h1>Sing your heart out</h1>
     <p>A modern karaoke experience in your browser</p>
   </section>
 
-  <!-- UPLOAD SECTION -->
+  <!-- UPLOAD -->
   <section id="upload">
     <h2>Start Singing</h2>
 
     <label>
       Upload Song
-      <input type="file" id="audioFile" accept="audio/*" />
+      <input type="file" id="audioFile" accept="audio/*">
     </label>
 
     <label>
       Upload Lyrics (.txt)
-      <input type="file" id="lyricsFile" accept=".txt" />
+      <input type="file" id="lyricsFile" accept=".txt">
     </label>
 
     <button id="startKaraoke">Start Karaoke</button>
   </section>
 
-  <!-- KARAOKE SECTION -->
+  <!-- KARAOKE -->
   <section id="karaoke">
     <audio id="audioPlayer" controls></audio>
 
     <div class="lyrics-box">
-      <ul id="lyricsList">
-        <!-- Lyrics lines will appear here -->
-      </ul>
+      <ul id="lyricsList"></ul>
     </div>
   </section>
 
-  <!-- RECORD SECTION -->
+  <!-- RECORD -->
   <section id="record">
     <h2>Record Your Voice</h2>
     <button id="recordBtn">🎙 Start Recording</button>
@@ -62,44 +57,45 @@
     <audio id="recordedAudio" controls></audio>
   </section>
 
-  <!-- ABOUT / SUPPORT SECTION -->
+  <!-- ABOUT / SUPPORT -->
   <section id="about">
-  <p>
-    This is an independent karaoke project built to explore
-    modern singing experiences on the web.
-  </p>
+    <p>
+      This is an independent karaoke project built to explore
+      modern singing experiences on the web.
+    </p>
 
-  <p class="support-text">
-    Support the developer as you like ❤️
-  </p>
+    <p class="support-text">
+      Support the developer as you like ❤️
+    </p>
 
-  <p class="future-note">
-    If I receive ₹50,000 in support from you all, I’ll start something new 🚀
-  </p>
+    <p class="future-note">
+      If I receive ₹50,000 in support from you all, I’ll start something new 🚀
+    </p>
 
-  <p class="contact-note">
-    If you face any problem, error, or have suggestions, feel free to mail me —
-    I’ll try my best to fix it.
-  </p>
+    <p class="contact-note">
+      If you face any problem, error, or have suggestions, feel free to mail me —
+      I’ll try my best to fix it.
+    </p>
 
-  <a href="mailto:anandwaghmareosmanabad@gmail.com" class="email-link">
-    📧 anandwaghmareosmanabad@gmail.com
-  </a>
+    <a href="mailto:anandwaghmareosmanabad@gmail.com">
+      📧 anandwaghmareosmanabad@gmail.com
+    </a>
 
-  <a
-    id="donateBtn"
-    href="upi://pay?pa=anandwaghmareosmanabad@okaxis&pn=Anand%20Waghmare&cu=INR"
-  >
-    Donate via UPI
-  </a>
+    <br><br>
+
+    <a
+      id="donateBtn"
+      href="upi://pay?pa=anandwaghmareosmanabad@okaxis&pn=Anand%20Waghmare&cu=INR">
+      Donate via UPI
+    </a>
   </section>
-  
+
   <!-- FOOTER -->
   <footer>
     <p>© 2025 Karaoke Website</p>
   </footer>
 
-  <!-- JAVASCRIPT (MUST BE LAST) -->
+  <!-- SCRIPT -->
   <script src="./script.js"></script>
 
 </body>
