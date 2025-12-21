@@ -44,6 +44,8 @@ lyricsFileInput.addEventListener("change", () => {
 
 // Start karaoke
 startBtn.addEventListener("click", () => {
+  console.log("Start Karaoke clicked");
+  
   if (!audioPlayer.src || lyricsLines.length === 0) {
     alert("Please upload audio and lyrics first");
     return;
