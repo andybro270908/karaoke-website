@@ -1,6 +1,6 @@
 {
   "title": "Demo Song",
-  "audio": "songs/demo.mp3",
+  "audio": "songs/demo.wav",
   "lyrics": [
     { "time": 2, "text": "This is the first line" },
     { "time": 6, "text": "This is the second line" },
