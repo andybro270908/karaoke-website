@@ -1,49 +1,77 @@
-body {
-  margin: 0;
-  font-family: system-ui, sans-serif;
-  background: #0b0b12;
-  color: white;
-  text-align: center;
-}
+const audioInput = document.getElementById("audioInput");
+const lyricsInput = document.getElementById("lyricsInput");
+const audioPlayer = document.getElementById("audioPlayer");
+const currentLineEl = document.getElementById("currentLine");
+const markBtn = document.getElementById("markBtn");
+const exportBtn = document.getElementById("exportBtn");
 
-header {
-  padding: 16px;
-  font-size: 20px;
-  font-weight: bold;
-  background: #111;
-}
+let lyrics = [];
+let index = 0;
+let result = [];
 
-section {
-  padding: 25px 20px;
-}
+// LOAD AUDIO
+audioInput.addEventListener("change", () => {
+  const file = audioInput.files[0];
+  if (file) {
+    audioPlayer.src = URL.createObjectURL(file);
+  }
+});
 
-audio {
-  width: 90%;
-  margin-top: 10px;
-}
+// LOAD LYRICS
+lyricsInput.addEventListener("change", () => {
+  const reader = new FileReader();
+  reader.onload = () => {
+    lyrics = reader.result
+      .split("\n")
+      .map(l => l.trim())
+      .filter(Boolean);
 
-button {
-  padding: 12px 20px;
-  border-radius: 999px;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
-  background: linear-gradient(135deg, #d946ef, #6366f1);
-  color: white;
-}
+    index = 0;
+    result = [];
 
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+    if (lyrics.length > 0) {
+      currentLineEl.textContent = lyrics[0];
+      markBtn.disabled = false;
+      exportBtn.disabled = true;
+    }
+  };
+  reader.readAsText(lyricsInput.files[0]);
+});
 
-#currentLine {
-  font-size: 20px;
-  margin: 20px 0;
-  min-height: 40px;
-}
+// MARK TIME
+markBtn.addEventListener("click", () => {
+  if (index >= lyrics.length) return;
 
-footer {
-  padding: 20px;
-  opacity: 0.6;
-}
+  result.push({
+    time: Number(audioPlayer.currentTime.toFixed(2)),
+    text: lyrics[index]
+  });
+
+  index++;
+
+  if (index < lyrics.length) {
+    currentLineEl.textContent = lyrics[index];
+  } else {
+    currentLineEl.textContent = "✅ All lines marked!";
+    markBtn.disabled = true;
+    exportBtn.disabled = false;
+  }
+});
+
+// EXPORT JSON
+exportBtn.addEventListener("click", () => {
+  const data = {
+    title: "Prepared Karaoke",
+    audio: "REPLACE_WITH_AUDIO_PATH.wav",
+    lyrics: result
+  };
+
+  const blob = new Blob([JSON.stringify(data, null, 2)], {
+    type: "application/json"
+  });
+
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "karaoke.json";
+  a.click();
+});
