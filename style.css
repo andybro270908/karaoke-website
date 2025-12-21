@@ -1,76 +1,49 @@
-:root {
-  --bg: #0b0b12;
-  --text: #ffffff;
-  --accent: #d946ef;
-}
-
-* {
-  box-sizing: border-box;
-}
-
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
-  background: radial-gradient(circle at top, #1a1033, #05050a);
-  color: var(--text);
+  background: #0b0b12;
+  color: white;
+  text-align: center;
 }
 
 header {
-  position: sticky;
-  top: 0;
-  padding: 12px 16px;
-  display: flex;
-  justify-content: space-between;
-  background: rgba(0,0,0,0.4);
+  padding: 16px;
+  font-size: 20px;
+  font-weight: bold;
+  background: #111;
 }
 
 section {
-  padding: 40px 20px;
-  text-align: center;
+  padding: 25px 20px;
 }
 
-button {
-  background: linear-gradient(135deg, #d946ef, #6366f1);
-  border: none;
-  color: white;
-  padding: 12px 18px;
-  border-radius: 999px;
-  font-size: 16px;
-  cursor: pointer;
+audio {
+  width: 90%;
   margin-top: 10px;
 }
 
-/* KARAOKE */
-
-.lyrics-box {
-  max-height: 300px;
-  overflow-y: auto;
-  margin-top: 20px;
-  padding: 15px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 12px;
+button {
+  padding: 12px 20px;
+  border-radius: 999px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  background: linear-gradient(135deg, #d946ef, #6366f1);
+  color: white;
 }
 
-#lyricsList {
-  list-style: none;
-  padding: 0;
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-#lyricsList li {
-  opacity: 0.4;
-  padding: 6px;
-}
-
-#lyricsList li.active {
-  opacity: 1;
-  color: var(--accent);
+#currentLine {
   font-size: 20px;
-  font-weight: bold;
-  text-shadow: 0 0 10px var(--accent);
+  margin: 20px 0;
+  min-height: 40px;
 }
 
 footer {
-  text-align: center;
-  opacity: 0.6;
   padding: 20px;
+  opacity: 0.6;
 }
