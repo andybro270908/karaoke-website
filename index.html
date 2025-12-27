@@ -52,20 +52,42 @@
 
   <section>
     <h2>🎶 Karaoke Player</h2>
-    <input type="file" id="playerJson" accept=".json">
-    <audio id="playerAudio" controls></audio>
 
+    <!-- Load prepared karaoke JSON -->
+    <input type="file" id="playerJson" accept=".json">
+
+    <!-- Audio controlled by Start button -->
+    <audio id="playerAudio"></audio>
+
+    <!-- Start Karaoke -->
+    <br><br>
+    <button id="startKaraokeBtn">▶ Start Karaoke</button>
+
+    <!-- Lyrics display -->
     <div class="lyrics-box">
       <ul id="playerLyrics"></ul>
     </div>
+
   </section>
 
 </div>
 
+<!-- =====================
+     FOOTER
+===================== -->
 <footer>
-  © 2025 Karaoke Tool
+  <p>© 2025 Karaoke Tool</p>
+  <p>
+    Support the developer as you like ❤️<br>
+    If I get ₹50k support from you all, then I’ll start something new
+  </p>
+  <p>
+    If any problem, error, or suggestions,<br>
+    mail me — I’ll try to fix it.
+  </p>
+  <p>
+    📧 <a href="mailto:anandwaghmareosmanabad@gmail.com">
+      anandwaghmareosmanabad@gmail.com
+    </a>
+  </p>
 </footer>
-
-<script src="script.js"></script>
-</body>
-</html>
