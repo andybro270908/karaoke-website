@@ -3,39 +3,67 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Karaoke Editor</title>
+  <title>Karaoke Tool</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
-  🎤 Karaoke Preparation Tool
+  🎤 Karaoke Editor & Player
 </header>
 
 <section>
-  <h2>1. Upload Audio</h2>
-  <input type="file" id="audioInput" accept="audio/*">
-  <audio id="audioPlayer" controls></audio>
+  <button id="modeToggle">🎤 Switch to Player Mode</button>
 </section>
 
-<section>
-  <h2>2. Upload Lyrics (.txt)</h2>
-  <input type="file" id="lyricsInput" accept=".txt">
-</section>
+<!-- =====================
+     EDITOR MODE
+===================== -->
+<div id="editorMode">
 
-<section>
-  <h2>3. Mark Lyrics Timing</h2>
-  <p id="currentLine">Upload lyrics to start</p>
-  <button id="markBtn" disabled>Mark Time & Next Line</button>
-</section>
+  <section>
+    <h2>1. Upload Audio</h2>
+    <input type="file" id="audioInput" accept="audio/*">
+    <audio id="audioPlayer" controls></audio>
+  </section>
 
-<section>
-  <h2>4. Export Karaoke JSON</h2>
-  <button id="exportBtn" disabled>Download JSON</button>
-</section>
+  <section>
+    <h2>2. Upload Lyrics (.txt)</h2>
+    <input type="file" id="lyricsInput" accept=".txt">
+  </section>
+
+  <section>
+    <h2>3. Mark Lyrics Timing</h2>
+    <p id="currentLine">Upload lyrics to start</p>
+    <button id="markBtn" disabled>Mark Time & Next Line</button>
+  </section>
+
+  <section>
+    <h2>4. Export Karaoke JSON</h2>
+    <button id="exportBtn" disabled>Download JSON</button>
+  </section>
+
+</div>
+
+<!-- =====================
+     PLAYER MODE
+===================== -->
+<div id="playerMode" style="display:none;">
+
+  <section>
+    <h2>🎶 Karaoke Player</h2>
+    <input type="file" id="playerJson" accept=".json">
+    <audio id="playerAudio" controls></audio>
+
+    <div class="lyrics-box">
+      <ul id="playerLyrics"></ul>
+    </div>
+  </section>
+
+</div>
 
 <footer>
-  © 2025 Karaoke Editor
+  © 2025 Karaoke Tool
 </footer>
 
 <script src="script.js"></script>
