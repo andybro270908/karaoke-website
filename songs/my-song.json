@@ -1,6 +1,6 @@
 {
   "title": "Prepared Karaoke",
-  "audio": "REPLACE_WITH_AUDIO_PATH.wav",
+  "audio": "songs/my-song.wav"
   "lyrics": [
     {
       "time": 18.25,
