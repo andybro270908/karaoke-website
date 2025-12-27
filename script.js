@@ -1,3 +1,29 @@
+/* =====================
+   MODE TOGGLE
+===================== */
+const modeToggle = document.getElementById("modeToggle");
+const editorMode = document.getElementById("editorMode");
+const playerMode = document.getElementById("playerMode");
+
+let isEditor = true;
+
+modeToggle.addEventListener("click", () => {
+  isEditor = !isEditor;
+
+  if (isEditor) {
+    editorMode.style.display = "block";
+    playerMode.style.display = "none";
+    modeToggle.textContent = "🎤 Switch to Player Mode";
+  } else {
+    editorMode.style.display = "none";
+    playerMode.style.display = "block";
+    modeToggle.textContent = "🔧 Switch to Editor Mode";
+  }
+});
+
+/* =====================
+   EDITOR LOGIC
+===================== */
 const audioInput = document.getElementById("audioInput");
 const lyricsInput = document.getElementById("lyricsInput");
 const audioPlayer = document.getElementById("audioPlayer");
@@ -9,39 +35,24 @@ let lyrics = [];
 let index = 0;
 let result = [];
 
-// LOAD AUDIO
 audioInput.addEventListener("change", () => {
-  const file = audioInput.files[0];
-  if (file) {
-    audioPlayer.src = URL.createObjectURL(file);
-  }
+  audioPlayer.src = URL.createObjectURL(audioInput.files[0]);
 });
 
-// LOAD LYRICS
 lyricsInput.addEventListener("change", () => {
   const reader = new FileReader();
   reader.onload = () => {
-    lyrics = reader.result
-      .split("\n")
-      .map(l => l.trim())
-      .filter(Boolean);
-
+    lyrics = reader.result.split("\n").map(l => l.trim()).filter(Boolean);
     index = 0;
     result = [];
-
-    if (lyrics.length > 0) {
-      currentLineEl.textContent = lyrics[0];
-      markBtn.disabled = false;
-      exportBtn.disabled = true;
-    }
+    currentLineEl.textContent = lyrics[0] || "";
+    markBtn.disabled = lyrics.length === 0;
+    exportBtn.disabled = true;
   };
   reader.readAsText(lyricsInput.files[0]);
 });
 
-// MARK TIME
 markBtn.addEventListener("click", () => {
-  if (index >= lyrics.length) return;
-
   result.push({
     time: Number(audioPlayer.currentTime.toFixed(2)),
     text: lyrics[index]
@@ -58,20 +69,64 @@ markBtn.addEventListener("click", () => {
   }
 });
 
-// EXPORT JSON
 exportBtn.addEventListener("click", () => {
-  const data = {
+  const json = {
     title: "Prepared Karaoke",
     audio: "REPLACE_WITH_AUDIO_PATH.wav",
     lyrics: result
   };
 
-  const blob = new Blob([JSON.stringify(data, null, 2)], {
-    type: "application/json"
-  });
-
+  const blob = new Blob([JSON.stringify(json, null, 2)], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = "karaoke.json";
   a.click();
 });
+
+/* =====================
+   PLAYER LOGIC
+===================== */
+const playerJson = document.getElementById("playerJson");
+const playerAudio = document.getElementById("playerAudio");
+const playerLyrics = document.getElementById("playerLyrics");
+
+let playLyrics = [];
+let currentIndex = -1;
+
+playerJson.addEventListener("change", async () => {
+  const file = playerJson.files[0];
+  const text = await file.text();
+  const data = JSON.parse(text);
+
+  playerAudio.src = data.audio;
+  playLyrics = data.lyrics;
+  playerLyrics.innerHTML = "";
+  currentIndex = -1;
+
+  playLyrics.forEach(l => {
+    const li = document.createElement("li");
+    li.textContent = l.text;
+    playerLyrics.appendChild(li);
+  });
+});
+
+playerAudio.addEventListener("timeupdate", () => {
+  for (let i = playLyrics.length - 1; i >= 0; i--) {
+    if (playerAudio.currentTime >= playLyrics[i].time) {
+      if (currentIndex !== i) {
+        highlight(i);
+        currentIndex = i;
+      }
+      break;
+    }
+  }
+});
+
+function highlight(i) {
+  const items = playerLyrics.querySelectorAll("li");
+  items.forEach(li => li.classList.remove("active"));
+  if (items[i]) {
+    items[i].classList.add("active");
+    items[i].scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+}
