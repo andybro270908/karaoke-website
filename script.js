@@ -124,8 +124,15 @@ startKaraokeBtn.addEventListener("click", () => {
     alert("Please load a karaoke JSON first");
     return;
   }
-  playerAudio.currentTime = 0;
-  playerAudio.play();
+
+  // Force audio load (IMPORTANT for mobile)
+  playerAudio.load();
+
+  // Play ONLY when audio is ready
+  playerAudio.oncanplay = () => {
+    playerAudio.currentTime = 0;
+    playerAudio.play();
+  };
 });
 
 playerAudio.addEventListener("timeupdate", () => {
