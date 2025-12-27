@@ -22,7 +22,7 @@ modeToggle.addEventListener("click", () => {
 });
 
 /* =====================
-   EDITOR LOGIC
+   EDITOR MODE (UNCHANGED)
 ===================== */
 const audioInput = document.getElementById("audioInput");
 const lyricsInput = document.getElementById("lyricsInput");
@@ -35,66 +35,84 @@ let lyrics = [];
 let index = 0;
 let result = [];
 
-audioInput.addEventListener("change", () => {
-  audioPlayer.src = URL.createObjectURL(audioInput.files[0]);
-});
-
-lyricsInput.addEventListener("change", () => {
-  const reader = new FileReader();
-  reader.onload = () => {
-    lyrics = reader.result.split("\n").map(l => l.trim()).filter(Boolean);
-    index = 0;
-    result = [];
-    currentLineEl.textContent = lyrics[0] || "";
-    markBtn.disabled = lyrics.length === 0;
-    exportBtn.disabled = true;
-  };
-  reader.readAsText(lyricsInput.files[0]);
-});
-
-markBtn.addEventListener("click", () => {
-  result.push({
-    time: Number(audioPlayer.currentTime.toFixed(2)),
-    text: lyrics[index]
+if (audioInput) {
+  audioInput.addEventListener("change", () => {
+    audioPlayer.src = URL.createObjectURL(audioInput.files[0]);
   });
+}
 
-  index++;
+if (lyricsInput) {
+  lyricsInput.addEventListener("change", () => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      lyrics = reader.result.split("\n").map(l => l.trim()).filter(Boolean);
+      index = 0;
+      result = [];
 
-  if (index < lyrics.length) {
-    currentLineEl.textContent = lyrics[index];
-  } else {
-    currentLineEl.textContent = "✅ All lines marked!";
-    markBtn.disabled = true;
-    exportBtn.disabled = false;
-  }
-});
+      if (lyrics.length > 0) {
+        currentLineEl.textContent = lyrics[0];
+        markBtn.disabled = false;
+        exportBtn.disabled = true;
+      }
+    };
+    reader.readAsText(lyricsInput.files[0]);
+  });
+}
 
-exportBtn.addEventListener("click", () => {
-  const json = {
-    title: "Prepared Karaoke",
-    audio: "REPLACE_WITH_AUDIO_PATH.wav",
-    lyrics: result
-  };
+if (markBtn) {
+  markBtn.addEventListener("click", () => {
+    result.push({
+      time: Number(audioPlayer.currentTime.toFixed(2)),
+      text: lyrics[index]
+    });
 
-  const blob = new Blob([JSON.stringify(json, null, 2)], { type: "application/json" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "karaoke.json";
-  a.click();
-});
+    index++;
+
+    if (index < lyrics.length) {
+      currentLineEl.textContent = lyrics[index];
+    } else {
+      currentLineEl.textContent = "✅ All lines marked!";
+      markBtn.disabled = true;
+      exportBtn.disabled = false;
+    }
+  });
+}
+
+if (exportBtn) {
+  exportBtn.addEventListener("click", () => {
+    const json = {
+      title: "Prepared Karaoke",
+      audio: "REPLACE_WITH_AUDIO_PATH.wav",
+      lyrics: result
+    };
+
+    const blob = new Blob([JSON.stringify(json, null, 2)], {
+      type: "application/json"
+    });
+
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "karaoke.json";
+    a.click();
+  });
+}
 
 /* =====================
-   PLAYER LOGIC
+   PLAYER MODE (FINAL)
 ===================== */
 const playerJson = document.getElementById("playerJson");
 const playerAudio = document.getElementById("playerAudio");
 const playerLyrics = document.getElementById("playerLyrics");
+const startKaraokeBtn = document.getElementById("startKaraokeBtn");
 
 let playLyrics = [];
 let currentIndex = -1;
 
+// Load JSON
 playerJson.addEventListener("change", async () => {
   const file = playerJson.files[0];
+  if (!file) return;
+
   const text = await file.text();
   const data = JSON.parse(text);
 
@@ -103,18 +121,29 @@ playerJson.addEventListener("change", async () => {
   playerLyrics.innerHTML = "";
   currentIndex = -1;
 
-  playLyrics.forEach(l => {
+  playLyrics.forEach(line => {
     const li = document.createElement("li");
-    li.textContent = l.text;
+    li.textContent = line.text;
     playerLyrics.appendChild(li);
   });
 });
 
+// Start button
+startKaraokeBtn.addEventListener("click", () => {
+  if (!playerAudio.src) {
+    alert("Please load a karaoke JSON first");
+    return;
+  }
+  playerAudio.currentTime = 0;
+  playerAudio.play();
+});
+
+// Sync lyrics
 playerAudio.addEventListener("timeupdate", () => {
   for (let i = playLyrics.length - 1; i >= 0; i--) {
     if (playerAudio.currentTime >= playLyrics[i].time) {
       if (currentIndex !== i) {
-        highlight(i);
+        highlightLine(i);
         currentIndex = i;
       }
       break;
@@ -122,11 +151,15 @@ playerAudio.addEventListener("timeupdate", () => {
   }
 });
 
-function highlight(i) {
+function highlightLine(index) {
   const items = playerLyrics.querySelectorAll("li");
   items.forEach(li => li.classList.remove("active"));
-  if (items[i]) {
-    items[i].classList.add("active");
-    items[i].scrollIntoView({ behavior: "smooth", block: "center" });
+
+  if (items[index]) {
+    items[index].classList.add("active");
+    items[index].scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
   }
 }
