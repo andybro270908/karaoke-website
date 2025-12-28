@@ -35,59 +35,76 @@ let lyrics = [];
 let index = 0;
 let result = [];
 
-audioInput.addEventListener("change", () => {
-  audioPlayer.src = URL.createObjectURL(audioInput.files[0]);
-});
-
-lyricsInput.addEventListener("change", () => {
-  const reader = new FileReader();
-  reader.onload = () => {
-    lyrics = reader.result.split("\n").map(l => l.trim()).filter(Boolean);
-    index = 0;
-    result = [];
-
-    if (lyrics.length > 0) {
-      currentLineEl.textContent = lyrics[0];
-      markBtn.disabled = false;
-      exportBtn.disabled = true;
+if (audioInput) {
+  audioInput.addEventListener("change", () => {
+    const file = audioInput.files[0];
+    if (file) {
+      audioPlayer.src = URL.createObjectURL(file);
     }
-  };
-  reader.readAsText(lyricsInput.files[0]);
-});
-
-markBtn.addEventListener("click", () => {
-  result.push({
-    time: Number(audioPlayer.currentTime.toFixed(2)),
-    text: lyrics[index]
   });
+}
 
-  index++;
+if (lyricsInput) {
+  lyricsInput.addEventListener("change", () => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      lyrics = reader.result
+        .split("\n")
+        .map(l => l.trim())
+        .filter(Boolean);
 
-  if (index < lyrics.length) {
-    currentLineEl.textContent = lyrics[index];
-  } else {
-    currentLineEl.textContent = "✅ All lines marked!";
-    markBtn.disabled = true;
-    exportBtn.disabled = false;
-  }
-});
+      index = 0;
+      result = [];
 
-exportBtn.addEventListener("click", () => {
-  const json = {
-    title: "Prepared Karaoke",
-    audio: "REPLACE_WITH_AUDIO_PATH.wav",
-    lyrics: result
-  };
-
-  const blob = new Blob([JSON.stringify(json, null, 2)], {
-    type: "application/json"
+      if (lyrics.length > 0) {
+        currentLineEl.textContent = lyrics[0];
+        markBtn.disabled = false;
+        exportBtn.disabled = true;
+      }
+    };
+    reader.readAsText(lyricsInput.files[0]);
   });
+}
 
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "karaoke.json";
-  a.click();
-});
+if (markBtn) {
+  markBtn.addEventListener("click", () => {
+    if (index >= lyrics.length) return;
+
+    result.push({
+      time: Number(audioPlayer.currentTime.toFixed(2)),
+      text: lyrics[index]
+    });
+
+    index++;
+
+    if (index < lyrics.length) {
+      currentLineEl.textContent = lyrics[index];
+    } else {
+      currentLineEl.textContent = "✅ All lines marked!";
+      markBtn.disabled = true;
+      exportBtn.disabled = false;
+    }
+  });
+}
+
+if (exportBtn) {
+  exportBtn.addEventListener("click", () => {
+    const json = {
+      title: "Prepared Karaoke",
+      audio: "REPLACE_WITH_AUDIO_PATH.wav",
+      lyrics: result
+    };
+
+    const blob = new Blob([JSON.stringify(json, null, 2)], {
+      type: "application/json"
+    });
+
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "karaoke.json";
+    a.click();
+  });
+}
 
 /* =====================
    PLAYER MODE
@@ -100,6 +117,7 @@ const startKaraokeBtn = document.getElementById("startKaraokeBtn");
 let playLyrics = [];
 let currentIndex = -1;
 
+// Load karaoke JSON
 playerJson.addEventListener("change", async () => {
   const file = playerJson.files[0];
   if (!file) return;
@@ -108,7 +126,7 @@ playerJson.addEventListener("change", async () => {
   const data = JSON.parse(text);
 
   playerAudio.src = data.audio;
-  playLyrics = data.lyrics;
+  playLyrics = data.lyrics || [];
   playerLyrics.innerHTML = "";
   currentIndex = -1;
 
@@ -119,22 +137,20 @@ playerJson.addEventListener("change", async () => {
   });
 });
 
+// START KARAOKE (MOBILE-SAFE)
 startKaraokeBtn.addEventListener("click", () => {
   if (!playerAudio.src) {
     alert("Please load a karaoke JSON first");
     return;
   }
 
-  // Force audio load (IMPORTANT for mobile)
-  playerAudio.load();
-
-  // Play ONLY when audio is ready
-  playerAudio.oncanplay = () => {
-    playerAudio.currentTime = 0;
-    playerAudio.play();
-  };
+  // DO NOT reset time
+  // DO NOT call load()
+  // Just play (mobile-safe after native unlock)
+  playerAudio.play();
 });
 
+// Sync lyrics
 playerAudio.addEventListener("timeupdate", () => {
   for (let i = playLyrics.length - 1; i >= 0; i--) {
     if (playerAudio.currentTime >= playLyrics[i].time) {
@@ -158,4 +174,4 @@ function highlightLine(index) {
       block: "center"
     });
   }
-}
+       }
